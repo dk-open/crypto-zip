@@ -13,7 +13,7 @@ import (
 	"net/http"
 )
 
-type FetchFunc[TModel any] func(ctx context.Context, data *TModel) error
+type FetchFunc[TModel any] func(data *TModel) error
 type IterateFetch[TModel any] func(f func(data TModel) error) error
 
 type FetcherReader func(ctx context.Context, f func(ctx context.Context, reader io.Reader) error) error
@@ -28,7 +28,7 @@ func FetcherWithClient[TModel any](c *http.Client, method string, url string, he
 		h(req)
 	}
 
-	return func(ctx context.Context, data *TModel) error {
+	return func(data *TModel) error {
 		return fetchRequest(c, req, data)
 	}
 }
@@ -40,7 +40,7 @@ func Fetcher[TModel any](method string, url string) FetchFunc[TModel] {
 	}
 	req.Header.Set("Accept-Encoding", "br, gzip, deflate")
 
-	return func(ctx context.Context, data *TModel) error {
+	return func(data *TModel) error {
 		return fetchRequest(client, req, data)
 	}
 }

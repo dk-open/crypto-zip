@@ -2,9 +2,9 @@ package binance
 
 import (
 	"context"
+	"github.com/dk-open/crypto-zip/http"
 	"github.com/dk-open/crypto-zip/scrap"
 	"github.com/dk-open/crypto-zip/scrap/exchange"
-	"github.com/dk-open/crypto-zip/tools/http"
 	"math"
 	"strconv"
 )

@@ -3,9 +3,9 @@ package bitrue
 import (
 	"context"
 	"fmt"
+	"github.com/dk-open/crypto-zip/http"
 	"github.com/dk-open/crypto-zip/scrap"
 	"github.com/dk-open/crypto-zip/scrap/exchange"
-	"github.com/dk-open/crypto-zip/tools/http"
 	"math"
 )
 

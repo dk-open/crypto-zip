@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/bcicen/jstream"
-	"github.com/dk-open/crypto-zip/tools/http"
+	"github.com/dk-open/crypto-zip/http"
 	"github.com/dk-open/crypto-zip/types"
 	"github.com/valyala/fastjson"
 	"io"
