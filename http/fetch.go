@@ -45,6 +45,16 @@ func Fetcher[TModel any](method string, url string) FetchFunc[TModel] {
 	}
 }
 
+func FetchDefaultEncoded[TModel any](method string, url string, res *TModel) error {
+	req, rErr := http.NewRequest(method, url, nil)
+	if rErr != nil {
+		log.Fatal(rErr)
+	}
+	req.Header.Set("Accept-Encoding", "br, gzip, deflate")
+
+	return fetchRequest(http.DefaultClient, req, res)
+}
+
 func fetchRequest[TModel any](c *http.Client, req *http.Request, res *TModel) error {
 	resp, err := c.Do(req)
 	if err != nil {
