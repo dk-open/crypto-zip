@@ -2,7 +2,6 @@ package http_test
 
 import (
 	"context"
-	"fmt"
 	"github.com/bcicen/jstream"
 	"github.com/dk-open/crypto-zip/http"
 	"github.com/dk-open/crypto-zip/types"
@@ -18,7 +17,6 @@ type testSymbolModel struct {
 }
 
 func TestFetcherWithDifferentEncodings(t *testing.T) {
-	ctx := context.Background()
 	targetUrl := "https://api.binance.com/api/v3/ticker/bookTicker"
 	preCompressed, err := fetchAndCompress(targetUrl)
 	if err != nil {
@@ -29,16 +27,16 @@ func TestFetcherWithDifferentEncodings(t *testing.T) {
 
 	fetcher := http.FetcherWithClient[[]testSymbolModel](client, "GET", targetUrl, http.WithCompression())
 	var res []testSymbolModel
-	if err = fetcher(ctx, &res); err != nil {
+	if err = fetcher(&res); err != nil {
 		t.Fatalf("Failed to fetch data: %v", err)
 	}
-	if err = fetcher(ctx, &res); err != nil {
+	if err = fetcher(&res); err != nil {
 		t.Fatalf("Failed to fetch data: %v", err)
 	}
-	if err = fetcher(ctx, &res); err != nil {
+	if err = fetcher(&res); err != nil {
 		t.Fatalf("Failed to fetch data: %v", err)
 	}
-	if err = fetcher(ctx, &res); err != nil {
+	if err = fetcher(&res); err != nil {
 		t.Fatalf("Failed to fetch data: %v", err)
 	}
 
@@ -48,7 +46,7 @@ func TestFetcherFastIterate(t *testing.T) {
 	targetUrl := "https://api.binance.com/api/v3/ticker/bookTicker"
 	fetcher2 := http.Iterator[testSymbolModel]("GET", targetUrl, 1, http.WithCompression())
 	if err := fetcher2(func(data testSymbolModel) error {
-		fmt.Println(data)
+		//fmt.Println(data)
 		return nil
 	}); err != nil {
 		t.Fatalf("Failed to fetch data: %v", err)
@@ -78,7 +76,7 @@ func BenchmarkFetcherGzip(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			var symbols []testSymbolModel
-			err = fetcherGzip(ctx, &symbols)
+			err = fetcherGzip(&symbols)
 			if err != nil {
 				b.Fatalf("Fetcher failed: %v", err)
 			}
@@ -90,7 +88,7 @@ func BenchmarkFetcherGzip(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			var symbols []testSymbolModel
-			err = fetcherBr(ctx, &symbols)
+			err = fetcherBr(&symbols)
 			if err != nil {
 				b.Fatalf("Fetcher failed: %v", err)
 			}
@@ -102,7 +100,7 @@ func BenchmarkFetcherGzip(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			var symbols []testSymbolModel
-			err = fetcherDeflate(ctx, &symbols)
+			err = fetcherDeflate(&symbols)
 			if err != nil {
 				b.Fatalf("Fetcher failed: %v", err)
 			}
@@ -114,7 +112,7 @@ func BenchmarkFetcherGzip(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			var symbols []testSymbolModel
-			err = fetcherPlain(ctx, &symbols)
+			err = fetcherPlain(&symbols)
 			if err != nil {
 				b.Fatalf("Fetcher failed: %v", err)
 			}

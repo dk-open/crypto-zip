@@ -42,7 +42,7 @@ func Prices(buf scrap.IPriceWriter) (err error) {
 
 func Markets(ctx context.Context) (res []exchange.Market, err error) {
 	var info marketsData
-	if err = marketsFetcher(ctx, &info); err != nil {
+	if err = marketsFetcher(&info); err != nil {
 		return nil, err
 	}
 
