@@ -31,7 +31,7 @@ func stringUpdater(addr unsafe.Pointer) func(data []byte) {
 	return func(data []byte) {
 		data = data[1 : len(data)-1]
 		copy(stringVal[:], data[:])
-		*(*string)(addr) = types.BytesToString(stringVal[:len(data)])
+		*(*string)(addr) = string(stringVal[:len(data)])
 	}
 }
 

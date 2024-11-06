@@ -6,6 +6,7 @@ import (
 	"compress/zlib"
 	"fmt"
 	"github.com/andybalholm/brotli"
+	"github.com/klauspost/compress/zstd"
 	"io"
 	"math/rand"
 	"net/http"
@@ -44,6 +45,9 @@ func (mrt *MockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error
 	if bytes.Contains([]byte(acceptEnc), []byte("deflate")) {
 		encodings = append(encodings, "deflate")
 	}
+	if bytes.Contains([]byte(acceptEnc), []byte("zstd")) {
+		encodings = append(encodings, "zstd")
+	}
 
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	encoding = encodings[rand.Int63n(int64(len(encodings)))]
@@ -58,6 +62,8 @@ func (mrt *MockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error
 	case "gzip":
 		data = mrt.PreCompressed.Gzip
 		contentEncoding = "gzip"
+	case "zstd":
+		data = mrt.PreCompressed.Zstd
 	case "deflate":
 		data = mrt.PreCompressed.Deflate
 		contentEncoding = "deflate"
@@ -85,6 +91,7 @@ type PreCompressedData struct {
 	Gzip     []byte
 	Deflate  []byte
 	Brotli   []byte
+	Zstd     []byte
 	Identity []byte
 }
 
@@ -123,6 +130,19 @@ func fetchAndCompress(url string) (*PreCompressedData, error) {
 	}
 	deflateWriter.Close()
 
+	// Compress using deflate
+	var zstdBuf bytes.Buffer
+	zstdWriter, err := zstd.NewWriter(&zstdBuf)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to write zstd data: %v", err)
+	}
+	_, err = zstdWriter.Write(identityData)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to write zstd data: %v", err)
+	}
+	zstdWriter.Flush()
+	zstdWriter.Close()
+
 	// Compress using brotli
 	var brotliBuf bytes.Buffer
 	brotliWriter := brotli.NewWriterLevel(&brotliBuf, brotli.BestCompression)
@@ -136,6 +156,7 @@ func fetchAndCompress(url string) (*PreCompressedData, error) {
 		Gzip:     gzipBuf.Bytes(),
 		Deflate:  deflateBuf.Bytes(),
 		Brotli:   brotliBuf.Bytes(),
+		Zstd:     zstdBuf.Bytes(),
 		Identity: identityData,
 	}, nil
 }

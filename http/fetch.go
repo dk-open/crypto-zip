@@ -1,13 +1,13 @@
 package http
 
 import (
-	"compress/gzip"
-	"compress/zlib"
 	"context"
 	"fmt"
 	"github.com/andybalholm/brotli"
 	"github.com/dk-open/crypto-zip/tools/jetjson"
 	"github.com/goccy/go-json"
+	"github.com/klauspost/compress/gzip"
+	"github.com/klauspost/compress/zlib"
 	"io"
 	"log"
 	"net/http"
@@ -38,7 +38,7 @@ func Fetcher[TModel any](method string, url string) FetchFunc[TModel] {
 	if rErr != nil {
 		log.Fatal(rErr)
 	}
-	req.Header.Set("Accept-Encoding", "br, gzip, deflate")
+	req.Header.Set("Accept-Encoding", "br,gzip,deflate")
 
 	return func(data *TModel) error {
 		return fetchRequest(client, req, data)
@@ -50,7 +50,7 @@ func FetchDefaultEncoded[TModel any](method string, url string, res *TModel) err
 	if rErr != nil {
 		log.Fatal(rErr)
 	}
-	req.Header.Set("Accept-Encoding", "br, gzip, deflate")
+	req.Header.Set("Accept-Encoding", "br,gzip,deflate")
 
 	return fetchRequest(http.DefaultClient, req, res)
 }

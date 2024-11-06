@@ -53,7 +53,7 @@ func TestFetcherFastIterate(t *testing.T) {
 	}
 }
 
-func BenchmarkFetcherGzip(b *testing.B) {
+func BenchmarkFetcher(b *testing.B) {
 	ctx := context.Background()
 	targetUrl := "https://www.bitrue.com/api/v1/ticker/24hr"
 	preCompressed, err := fetchAndCompress(targetUrl)
@@ -64,6 +64,7 @@ func BenchmarkFetcherGzip(b *testing.B) {
 	client := createMockClient(preCompressed)
 
 	fetcherGzip := http.FetcherWithClient[[]testSymbolModel](client, "GET", targetUrl, http.WithHeader("Accept-Encoding", "gzip"))
+	//fetcherZstd := http.FetcherWithClient[[]testSymbolModel](client, "GET", targetUrl, http.WithHeader("Accept-Encoding", "zstd"))
 	fetcherGzipFast := http.IteratorWithClient[testSymbolModel](client, "GET", targetUrl, 1, http.WithHeader("Accept-Encoding", "gzip"))
 	fetcherBrFast := http.IteratorWithClient[testSymbolModel](client, "GET", targetUrl, 1, http.WithHeader("Accept-Encoding", "br"))
 	fetcherPlainFast := http.IteratorWithClient[testSymbolModel](client, "GET", targetUrl, 1)
@@ -83,6 +84,18 @@ func BenchmarkFetcherGzip(b *testing.B) {
 		}
 		b.ReportAllocs()
 	})
+
+	//b.Run("Zstd", func(b *testing.B) {
+	//	b.ResetTimer()
+	//	for i := 0; i < b.N; i++ {
+	//		var symbols []testSymbolModel
+	//		err = fetcherZstd(&symbols)
+	//		if err != nil {
+	//			b.Fatalf("Fetcher failed: %v", err)
+	//		}
+	//	}
+	//	b.ReportAllocs()
+	//})
 
 	b.Run("Br", func(b *testing.B) {
 		b.ResetTimer()
